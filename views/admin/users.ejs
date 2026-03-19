@@ -1,0 +1,122 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="container py-5">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <h1 class="fw-bold mb-1">Manage Users</h1>
+      <p class="text-muted mb-0"><%= total %> total user<%= total !== 1 ? 's' : '' %></p>
+    </div>
+    <a href="/admin/dashboard" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Dashboard
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <form action="/admin/users" method="GET" class="card detail-card p-3 mb-4">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-5">
+        <input type="text" class="form-control" name="q" placeholder="Search by name or email..." value="<%= q %>" />
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" name="role">
+          <option value="">All Roles</option>
+          <option value="seeker" <%= role==='seeker'?'selected':'' %>>Job Seekers</option>
+          <option value="employer" <%= role==='employer'?'selected':'' %>>Employers</option>
+          <option value="admin" <%= role==='admin'?'selected':'' %>>Admins</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Filter</button>
+      </div>
+      <div class="col-md-2">
+        <a href="/admin/users" class="btn btn-outline-secondary w-100">Clear</a>
+      </div>
+    </div>
+  </form>
+
+  <div class="card detail-card">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="px-4">User</th>
+            <th>Role</th>
+            <th>Company</th>
+            <th>Joined</th>
+            <th class="text-end px-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (users.length === 0) { %>
+            <tr><td colspan="5" class="text-center py-4 text-muted">No users found.</td></tr>
+          <% } %>
+          <% users.forEach(u => { %>
+          <tr>
+            <td class="px-4">
+              <div class="d-flex align-items-center gap-3">
+                <div class="avatar-sm role-<%= u.role %>-avatar"><%= u.name.charAt(0).toUpperCase() %></div>
+                <div>
+                  <div class="fw-semibold">
+                    <%= u.name %>
+                    <% if (u.id === currentUser.id) { %><span class="badge bg-primary ms-1 small">You</span><% } %>
+                  </div>
+                  <div class="text-muted small"><%= u.email %></div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge role-badge role-<%= u.role %>"><%= u.role %></span></td>
+            <td class="text-muted small"><%= u.company_name || '—' %></td>
+            <td class="text-muted small"><%= new Date(u.created_at).toLocaleDateString() %></td>
+            <td class="text-end px-4">
+              <div class="d-flex gap-2 justify-content-end">
+                <!-- Change role -->
+                <form action="/admin/users/<%= u.id %>/role?_method=PUT" method="POST" class="d-flex gap-1">
+                  <select class="form-select form-select-sm" name="role" style="width:120px;">
+                    <% ['seeker','employer','admin'].forEach(r => { %>
+                      <option value="<%= r %>" <%= u.role === r ? 'selected' : '' %>><%= r %></option>
+                    <% }) %>
+                  </select>
+                  <button type="submit" class="btn btn-sm btn-outline-warning" title="Change Role"
+                    <% if (u.id === currentUser.id) { %>disabled<% } %>>
+                    <i class="bi bi-arrow-repeat"></i>
+                  </button>
+                </form>
+                <!-- Delete user -->
+                <% if (u.id !== currentUser.id) { %>
+                  <form action="/admin/users/<%= u.id %>?_method=DELETE" method="POST"
+                    onsubmit="return confirm('Permanently delete user <%= u.name %>?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                <% } %>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <% if (pages > 1) { %>
+    <nav class="mt-4 d-flex justify-content-center">
+      <ul class="pagination">
+        <% if (page > 1) { %>
+          <li class="page-item"><a class="page-link" href="/admin/users?page=<%= page-1 %>&q=<%= q %>&role=<%= role %>"><i class="bi bi-chevron-left"></i></a></li>
+        <% } %>
+        <% for (let i = 1; i <= pages; i++) { %>
+          <li class="page-item <%= i===page?'active':'' %>">
+            <a class="page-link" href="/admin/users?page=<%= i %>&q=<%= q %>&role=<%= role %>"><%= i %></a>
+          </li>
+        <% } %>
+        <% if (page < pages) { %>
+          <li class="page-item"><a class="page-link" href="/admin/users?page=<%= page+1 %>&q=<%= q %>&role=<%= role %>"><i class="bi bi-chevron-right"></i></a></li>
+        <% } %>
+      </ul>
+    </nav>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In | JobPortal</title>
+  <link rel="icon" href="/img/job.png" type="image/png" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+
+    .login-wrap {
+      display: flex;
+      min-height: calc(100vh - 64px);
+    }
+
+    /* ── Left Panel ── */
+    .login-left {
+      width: 60%;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #0f0a04 0%, #1a0a05 50%, #0d0d0d 100%);
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-left::before {
+      content: '';
+      position: absolute;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(255,107,53,.2) 0%, transparent 65%);
+      top: -100px; right: -80px;
+      pointer-events: none;
+    }
+    .login-left::after {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(123,45,139,.12) 0%, transparent 65%);
+      bottom: -60px; left: -60px;
+      pointer-events: none;
+    }
+    .ll-brand {
+      display: flex; align-items: center; gap: .6rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.35rem; font-weight: 700;
+      margin-bottom: 2.5rem;
+      position: relative; z-index: 1;
+    }
+    .ll-brand span { color: #ff6b35; }
+    .ll-h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.9rem; font-weight: 700;
+      line-height: 1.2; color: #f0ede8;
+      margin-bottom: .9rem;
+      position: relative; z-index: 1;
+    }
+    .ll-sub {
+      font-size: .88rem; color: #666;
+      line-height: 1.75; margin-bottom: 2rem;
+      position: relative; z-index: 1;
+    }
+    .ll-perks {
+      display: flex; flex-direction: column; gap: .85rem;
+      position: relative; z-index: 1;
+    }
+    .ll-perk {
+      display: flex; align-items: center; gap: .85rem;
+      font-size: .84rem; color: #888;
+    }
+    .ll-perk-icon {
+      width: 34px; height: 34px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; flex-shrink: 0;
+    }
+
+    /* ── Right Panel ── */
+    .login-right {
+      width: 40%;
+      min-height: calc(100vh - 64px);
+      background: #0d0d0d;
+      border-left: 1px solid #1a1a1a;
+      padding: 0 3.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .lr-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.6rem; font-weight: 700;
+      color: #f0ede8; margin-bottom: .3rem;
+    }
+    .lr-sub { font-size: .83rem; color: #5bafd6; margin-bottom: 1.8rem; }
+
+    /* Role tabs */
+    .lr-role-tabs { display: flex; gap: .5rem; margin-bottom: 1.6rem; }
+    .lr-role-btn {
+      flex: 1; padding: .5rem .4rem;
+      border-radius: 10px;
+      border: 1.5px solid #222;
+      background: #141414;
+      color: #555; font-size: .78rem; font-weight: 700;
+      cursor: pointer; text-align: center;
+      display: flex; align-items: center; justify-content: center; gap: .35rem;
+      transition: all .2s; font-family: 'DM Sans', sans-serif;
+    }
+    .lr-role-btn:hover { border-color: #ff6b35; color: #ff6b35; }
+    .lr-role-btn.active[data-role="seeker"]   { background: linear-gradient(135deg,#ff6b35,#ff3864); border-color:transparent; color:#fff; box-shadow:0 4px 14px rgba(255,107,53,.35); }
+    .lr-role-btn.active[data-role="employer"] { background: linear-gradient(135deg,#1a936f,#0de5a8); border-color:transparent; color:#fff; box-shadow:0 4px 14px rgba(26,147,111,.3); }
+    .lr-role-btn.active[data-role="admin"]    { background: linear-gradient(135deg,#7b2d8b,#ff3864); border-color:transparent; color:#fff; box-shadow:0 4px 14px rgba(123,45,139,.3); }
+
+    /* Form fields */
+    .lr-field-label { font-size: .78rem; font-weight: 700; color: #f0ede8; margin-bottom: .4rem; display: block; }
+    .lr-input-wrap { position: relative; margin-bottom: 1.1rem; }
+    .lr-input-icon {
+      position: absolute; left: .9rem; top: 50%; transform: translateY(-50%);
+      color: #444; font-size: .88rem; pointer-events: none;
+    }
+    .lr-input {
+      width: 100%;
+      background: #141414;
+      border: 1.5px solid #222;
+      border-radius: 10px;
+      padding: .65rem .9rem .65rem 2.3rem;
+      color: #f0ede8;
+      font-size: .88rem;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .lr-input:focus { border-color: #ff6b35; }
+    .lr-input::placeholder { color: #333; }
+    .lr-eye-btn {
+      position: absolute; right: .7rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: #444; cursor: pointer; padding: .2rem;
+      font-size: .85rem; transition: color .15s;
+    }
+    .lr-eye-btn:hover { color: #888; }
+
+    /* Sign in button */
+    .lr-btn {
+      width: 100%;
+      padding: .75rem;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700; font-size: .95rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all .2s;
+      margin-top: .3rem;
+    }
+    .lr-btn.seeker-btn  { background: linear-gradient(135deg,#ff6b35,#ff3864); color:#fff; box-shadow:0 6px 20px rgba(255,107,53,.35); }
+    .lr-btn.employer-btn{ background: linear-gradient(135deg,#1a936f,#0de5a8); color:#fff; box-shadow:0 6px 20px rgba(26,147,111,.3); }
+    .lr-btn.admin-btn   { background: linear-gradient(135deg,#7b2d8b,#ff3864); color:#fff; box-shadow:0 6px 20px rgba(123,45,139,.3); }
+    .lr-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+
+    /* Divider */
+    .lr-divider {
+      text-align: center; font-size: .75rem; color: #333;
+      margin: 1.2rem 0; position: relative;
+    }
+    .lr-divider::before, .lr-divider::after {
+      content: ''; position: absolute; top: 50%;
+      width: 42%; height: 1px; background: #1e1e1e;
+    }
+    .lr-divider::before { left: 0; }
+    .lr-divider::after  { right: 0; }
+
+    /* Demo cred */
+    .lr-demo {
+      background: rgba(255,107,53,.07);
+      border: 1px dashed rgba(255,107,53,.25);
+      border-radius: 10px; padding: .6rem .9rem;
+      font-size: .78rem; color: #666; font-family: monospace;
+      margin-top: .8rem;
+    }
+    .lr-demo .badge-admin { background: #ff3864; color:#fff; font-size:.65rem; border-radius:4px; padding:2px 7px; font-family:'DM Sans',sans-serif; font-weight:700; margin-right:.4rem; }
+
+    @media (max-width: 768px) {
+      .login-left { display: none; }
+      .login-right { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg sticky-top" id="main-navbar">
+    <div class="container-fluid px-3">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/index.html">
+        <img src="/img/job.png" alt="JobPortal" style="height:34px;width:34px;object-fit:contain;" />
+        Job<span class="brand-accent">Portal</span>
+      </a>
+      <ul class="navbar-nav ms-3">
+        <li class="nav-item"><a class="nav-link" href="/index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div id="flash-container" style="position:fixed;top:80px;left:50%;transform:translateX(-50%);width:420px;z-index:9999;"></div>
+
+  <div class="login-wrap">
+    <!-- Left Panel -->
+    <div class="login-left">
+      <div class="ll-brand">
+        <img src="/img/job.png" style="height:30px;width:30px;object-fit:contain;" />
+        <span>JobPortal</span>
+      </div>
+      <h2 class="ll-h2">Your Next Opportunity<br>Starts Here</h2>
+      <p class="ll-sub">Join thousands of job seekers and employers using JobPortal to connect, apply, and hire smarter.</p>
+      <div class="ll-perks">
+        <div class="ll-perk">
+          <div class="ll-perk-icon" style="background:rgba(255,107,53,.15);">🚀</div>
+          <span>Apply to 1,200+ active job listings instantly</span>
+        </div>
+        <div class="ll-perk">
+          <div class="ll-perk-icon" style="background:rgba(26,147,111,.15);">📊</div>
+          <span>Track all your applications in one dashboard</span>
+        </div>
+        <div class="ll-perk">
+          <div class="ll-perk-icon" style="background:rgba(123,45,139,.15);">🏢</div>
+          <span>Connect with 340+ verified companies</span>
+        </div>
+        <div class="ll-perk">
+          <div class="ll-perk-icon" style="background:rgba(0,78,137,.2);">🔔</div>
+          <span>Get real-time updates on your application status</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="login-right">
+      <div class="lr-title">Welcome Back 👋</div>
+      <div class="lr-sub">Sign in to your account to continue</div>
+
+      <!-- Role Tabs -->
+      <div class="lr-role-tabs">
+        <button type="button" class="lr-role-btn active" data-role="seeker" onclick="switchRole('seeker',this)">
+          <i class="bi bi-person-fill"></i> Job Seeker
+        </button>
+        <button type="button" class="lr-role-btn" data-role="employer" onclick="switchRole('employer',this)">
+          <i class="bi bi-building"></i> Employer
+        </button>
+        <button type="button" class="lr-role-btn" data-role="admin" onclick="switchRole('admin',this)">
+          <i class="bi bi-shield-lock-fill"></i> Admin
+        </button>
+      </div>
+
+      <form id="loginForm" novalidate>
+        <label class="lr-field-label">Email Address</label>
+        <div class="lr-input-wrap">
+          <i class="bi bi-envelope lr-input-icon"></i>
+          <input type="email" class="lr-input" id="email" placeholder="you@example.com" required autofocus />
+        </div>
+
+        <label class="lr-field-label">Password</label>
+        <div class="lr-input-wrap">
+          <i class="bi bi-lock lr-input-icon"></i>
+          <input type="password" class="lr-input" id="password" placeholder="••••••••" required style="padding-right:2.5rem;" />
+          <button type="button" class="lr-eye-btn" onclick="togglePwd(this)"><i class="bi bi-eye"></i></button>
+        </div>
+
+        <button type="submit" class="lr-btn seeker-btn" id="signInBtn">
+          Sign In →
+        </button>
+      </form>
+
+      <div id="demoCred" class="lr-demo" style="display:none;">
+        <span class="badge-admin">Admin</span>admin@jobportal.com / Admin@1234
+      </div>
+
+      <div class="lr-divider">or</div>
+      <p class="text-center small mb-0" style="color:#444;">
+        Don't have an account?
+        <a href="/register.html" style="color:#ff6b35;font-weight:700;">Register here</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/nav.js"></script>
+  <script>
+    const roleConfig = {
+      seeker:   { btnClass:'seeker-btn',   icon:'bi-person-fill',      label:'Job Seeker' },
+      employer: { btnClass:'employer-btn', icon:'bi-building',         label:'Employer' },
+      admin:    { btnClass:'admin-btn',    icon:'bi-shield-lock-fill', label:'Admin', demo:true }
+    };
+
+    function switchRole(role, btn) {
+      document.querySelectorAll('.lr-role-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cfg = roleConfig[role];
+      const signInBtn = document.getElementById('signInBtn');
+      signInBtn.className = `lr-btn ${cfg.btnClass}`;
+      signInBtn.textContent = 'Sign In →';
+      document.getElementById('demoCred').style.display = cfg.demo ? '' : 'none';
+      if (cfg.demo) {
+        document.getElementById('email').value = 'admin@jobportal.com';
+        document.getElementById('password').value = 'Admin@1234';
+      } else {
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+      }
+    }
+
+    function togglePwd(btn) {
+      const input = document.getElementById('password');
+      const icon  = btn.querySelector('i');
+      if (input.type === 'password') { input.type = 'text';     icon.className = 'bi bi-eye-slash'; }
+      else                           { input.type = 'password'; icon.className = 'bi bi-eye'; }
+    }
+
+    function animateProgress(btn, btnClass, onDone) {
+      btn.disabled = true;
+      let pct = 0;
+      const steps = [
+        { target:30,  delay:30, label:'Verifying...' },
+        { target:65,  delay:22, label:'Authenticating...' },
+        { target:90,  delay:17, label:'Loading profile...' },
+        { target:100, delay:12, label:'Almost there...' }
+      ];
+      let stepIdx = 0;
+      function setProgress(p, label) {
+        btn.innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;line-height:1.2;">
+            <span style="font-size:.82rem;font-weight:700;">${label} ${p}%</span>
+            <div style="width:100%;height:4px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;">
+              <div style="width:${p}%;height:100%;background:#fff;border-radius:99px;transition:width .1s ease;"></div>
+            </div>
+          </div>`;
+      }
+      function runStep() {
+        if (stepIdx >= steps.length) { onDone(); return; }
+        const step = steps[stepIdx++];
+        function tick() {
+          if (pct >= step.target) { runStep(); return; }
+          pct++; setProgress(pct, step.label);
+          setTimeout(tick, step.delay);
+        }
+        tick();
+      }
+      runStep();
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('signInBtn');
+      const role = document.querySelector('.lr-role-btn.active')?.dataset.role || 'seeker';
+      const cfg  = roleConfig[role];
+
+      animateProgress(btn, cfg.btnClass, async () => {
+        try {
+          const data = await apiFetch('/api/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value, role })
+          });
+          const r = data.user.role;
+          if (r === 'admin')    window.location.href = '/admin/dashboard.html';
+          else if (r === 'employer') window.location.href = '/employer/dashboard.html';
+          else window.location.href = '/seeker/dashboard.html';
+        } catch (err) {
+          showAlert(err.message);
+          btn.disabled = false;
+          btn.className = `lr-btn ${cfg.btnClass}`;
+          btn.textContent = 'Sign In →';
+        }
+      });
+    });
+
+    getCurrentUser().then(user => {
+      if (!user) return;
+      if (user.role === 'admin')    window.location.href = '/admin/dashboard.html';
+      else if (user.role === 'employer') window.location.href = '/employer/dashboard.html';
+      else window.location.href = '/seeker/dashboard.html';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="container py-5">
+  <div class="mb-4">
+    <a href="/employer/dashboard" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+    </a>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h1 class="fw-bold mb-1">Applicants</h1>
+      <p class="text-muted mb-0">
+        <span class="badge type-badge type-<%= job.type %>"><%= job.type %></span>
+        <span class="ms-2"><%= job.title %></span> &bull; <%= job.company %> &bull; <%= job.location %>
+      </p>
+    </div>
+    <div class="text-end">
+      <div class="fs-2 fw-bold text-primary"><%= applicants.length %></div>
+      <div class="text-muted small">Total Applicants</div>
+    </div>
+  </div>
+
+  <% if (applicants.length === 0) { %>
+    <div class="card detail-card text-center py-5">
+      <i class="bi bi-people display-1 text-muted opacity-25"></i>
+      <h5 class="mt-3 text-muted">No applicants yet</h5>
+      <p class="text-muted small">Share your job posting to attract candidates.</p>
+    </div>
+  <% } else { %>
+    <!-- Status summary -->
+    <div class="row g-2 mb-4">
+      <% const statusMap = {pending:0, reviewed:0, shortlisted:0, rejected:0, hired:0};
+         applicants.forEach(a => { if (statusMap[a.status] !== undefined) statusMap[a.status]++; }); %>
+      <% Object.entries(statusMap).forEach(([s, count]) => { %>
+        <div class="col">
+          <div class="card text-center p-2 border-0 status-summary-card">
+            <div class="fw-bold fs-5"><%= count %></div>
+            <div class="text-muted small text-capitalize"><%= s %></div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="d-flex flex-column gap-3">
+      <% applicants.forEach(app => { %>
+        <div class="card detail-card applicant-card">
+          <div class="card-body p-4">
+            <div class="row g-3 align-items-start">
+              <div class="col-md-6">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                  <div class="avatar-circle"><%= app.name.charAt(0).toUpperCase() %></div>
+                  <div>
+                    <div class="fw-semibold fs-6"><%= app.name %></div>
+                    <a href="mailto:<%= app.email %>" class="text-muted small text-decoration-none">
+                      <i class="bi bi-envelope me-1"></i><%= app.email %>
+                    </a>
+                    <% if (app.phone) { %>
+                      <div class="text-muted small"><i class="bi bi-telephone me-1"></i><%= app.phone %></div>
+                    <% } %>
+                  </div>
+                </div>
+                <% if (app.bio) { %><p class="text-muted small mb-0"><%= app.bio.substring(0, 120) %><%= app.bio.length > 120 ? '...' : '' %></p><% } %>
+              </div>
+
+              <div class="col-md-3">
+                <% if (app.cover_letter) { %>
+                  <div class="cover-letter-preview small">
+                    <div class="text-muted small fw-medium mb-1"><i class="bi bi-file-text me-1"></i>Cover Letter</div>
+                    <p class="mb-0 text-muted"><%= app.cover_letter.substring(0, 150) %><%= app.cover_letter.length > 150 ? '...' : '' %></p>
+                  </div>
+                <% } else { %>
+                  <p class="text-muted small fst-italic">No cover letter provided.</p>
+                <% } %>
+                <div class="text-muted small mt-2">
+                  <i class="bi bi-clock me-1"></i>Applied <%= new Date(app.created_at).toLocaleDateString() %>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div class="mb-2">
+                  <span class="badge status-badge status-<%= app.status %> fs-7"><%= app.status %></span>
+                </div>
+                <form action="/employer/applications/<%= app.id %>/status?_method=PUT" method="POST">
+                  <input type="hidden" name="job_id" value="<%= job.id %>" />
+                  <select class="form-select form-select-sm mb-2" name="status">
+                    <% ['pending','reviewed','shortlisted','rejected','hired'].forEach(s => { %>
+                      <option value="<%= s %>" <%= app.status === s ? 'selected' : '' %>>
+                        <%= s.charAt(0).toUpperCase() + s.slice(1) %>
+                      </option>
+                    <% }) %>
+                  </select>
+                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">Update Status</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

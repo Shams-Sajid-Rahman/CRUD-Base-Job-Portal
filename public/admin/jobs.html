@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Jobs | JobPortal</title>
+  <link rel="icon" href="/img/job.png" type="image/png" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg sticky-top" id="main-navbar">
+    <div class="container-fluid px-3">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/index.html">
+        <img src="/img/job.png" alt="JobPortal" style="height:34px;width:34px;object-fit:contain;" />
+        Job<span class="brand-accent">Portal</span>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-2" id="navbarContent"></div>
+    </div>
+  </nav>
+  <div style="position:fixed;top:80px;left:50%;transform:translateX(-50%);width:420px;z-index:9999;" id="flash-container"></div>
+
+  <div class="dash-wrap">
+    <div class="dash-sidebar">
+      <div class="dash-sidebar-title text-gradient">Admin Panel</div>
+      <div class="dash-sidebar-sub">Manage Platform</div>
+
+      <div class="sidebar-label">Overview</div>
+      <a href="/admin/dashboard.html" class="sidebar-item"><i class="bi bi-grid"></i> Dashboard</a>
+
+      <div class="sidebar-label">Manage</div>
+      <a href="/admin/users.html" class="sidebar-item"><i class="bi bi-people"></i> Users</a>
+      <a href="/admin/jobs.html" class="sidebar-item active si-admin"><i class="bi bi-briefcase"></i> Jobs</a>
+      <a href="/admin/applications.html" class="sidebar-item"><i class="bi bi-file-text"></i> Applications</a>
+
+      <div class="sidebar-label">Account</div>
+      <a href="#" onclick="doLogout()" class="sidebar-item text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+
+    <div class="dash-main">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0 text-gradient" id="pageTitle">Manage Jobs</h3>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body py-2 px-3">
+          <div class="row g-2">
+            <div class="col-md-5">
+              <input type="text" class="form-control" id="searchQ" placeholder="Search title or company..." oninput="loadJobs()" />
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" id="statusFilter" onchange="loadJobs()">
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="closed">Closed</option>
+                <option value="draft">Draft</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body p-0" id="jobsContent">
+          <div class="text-center py-5"><div class="spinner-border"></div></div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center mt-3" id="paginationWrap"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/nav.js"></script>
+  <script>
+    let currentPage = 1;
+
+    async function loadJobs(page = 1) {
+      currentPage = page;
+      const q      = document.getElementById('searchQ').value;
+      const status = document.getElementById('statusFilter').value;
+      try {
+        const { jobs, pages } = await apiFetch(`/api/admin/jobs?q=${encodeURIComponent(q)}&status=${status}&page=${page}`);
+        if (!jobs.length) {
+          document.getElementById('jobsContent').innerHTML = `<div class="text-center py-5 text-muted"><i class="bi bi-briefcase fs-1 d-block mb-3"></i>No jobs found.</div>`;
+          document.getElementById('paginationWrap').innerHTML = '';
+          return;
+        }
+        document.getElementById('jobsContent').innerHTML = `
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Job</th><th>Employer</th><th>Apps</th><th>Status</th><th>Posted</th><th>Actions</th></tr></thead>
+            <tbody>${jobs.map(j => `
+              <tr>
+                <td class="fw-medium">${j.title}<br><small class="text-muted">${j.company} &bull; ${j.location}</small></td>
+                <td class="text-muted small">${j.employer_name}</td>
+                <td class="text-muted">${j.app_count}</td>
+                <td>
+                  <select class="form-select form-select-sm" style="width:110px;" onchange="changeStatus(${j.id}, this.value, this)">
+                    ${['active','closed','draft'].map(s => `<option ${j.status===s?'selected':''}>${s}</option>`).join('')}
+                  </select>
+                </td>
+                <td class="text-muted small">${formatDate(j.created_at)}</td>
+                <td><button class="btn btn-sm btn-outline-danger" onclick="deleteJob(${j.id}, this)"><i class="bi bi-trash"></i></button></td>
+              </tr>`).join('')}
+            </tbody>
+          </table>`;
+        let pg = '';
+        for (let i = 1; i <= pages; i++)
+          pg += `<li class="page-item ${i===page?'active':''}"><a class="page-link" href="#" onclick="loadJobs(${i});return false;">${i}</a></li>`;
+        document.getElementById('paginationWrap').innerHTML = pages > 1 ? `<nav><ul class="pagination">${pg}</ul></nav>` : '';
+      } catch (err) { showAlert(err.message); }
+    }
+
+    async function changeStatus(id, status, select) {
+      select.disabled = true;
+      try {
+        await apiFetch(`/api/admin/jobs/${id}/status`, { method:'PUT', body:JSON.stringify({ status }) });
+        showAlert('Status updated.', 'success');
+      } catch (err) { showAlert(err.message); }
+      select.disabled = false;
+    }
+
+    async function deleteJob(id, btn) {
+      if (!confirm('Delete this job permanently?')) return;
+      btn.disabled = true;
+      try {
+        await apiFetch(`/api/admin/jobs/${id}`, { method:'DELETE' });
+        showAlert('Job deleted.', 'success');
+        loadJobs(currentPage);
+      } catch (err) { showAlert(err.message); btn.disabled = false; }
+    }
+
+    async function init() {
+      const user = await getCurrentUser();
+      if (!user || user.role !== 'admin') { window.location.href = '/login.html'; return; }
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get('status');
+      const label  = params.get('label');
+      if (status) document.getElementById('statusFilter').value = status;
+      if (label) {
+        document.getElementById('pageTitle').textContent = label;
+        document.title = label + ' | JobPortal';
+      }
+      loadJobs();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

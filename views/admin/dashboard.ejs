@@ -1,0 +1,137 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="container py-5">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-5 gap-3">
+    <div>
+      <div class="badge bg-danger mb-2"><i class="bi bi-shield-fill me-1"></i>Admin Panel</div>
+      <h1 class="fw-bold mb-1">Admin Dashboard</h1>
+      <p class="text-muted mb-0">Platform overview and management</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/admin/users" class="btn btn-outline-primary"><i class="bi bi-people me-2"></i>Manage Users</a>
+      <a href="/admin/jobs" class="btn btn-outline-warning"><i class="bi bi-briefcase me-2"></i>Manage Jobs</a>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="row g-3 mb-5">
+    <div class="col-6 col-md-2">
+      <div class="stat-card card text-center p-3">
+        <div class="stat-icon text-info"><i class="bi bi-person-fill"></i></div>
+        <div class="stat-num"><%= stats.seekers || 0 %></div>
+        <div class="stat-lbl">Seekers</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="stat-card card text-center p-3">
+        <div class="stat-icon text-warning"><i class="bi bi-building"></i></div>
+        <div class="stat-num"><%= stats.employers || 0 %></div>
+        <div class="stat-lbl">Employers</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="stat-card card text-center p-3">
+        <div class="stat-icon text-success"><i class="bi bi-briefcase-fill"></i></div>
+        <div class="stat-num"><%= stats.active_jobs || 0 %></div>
+        <div class="stat-lbl">Active Jobs</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="stat-card card text-center p-3">
+        <div class="stat-icon text-primary"><i class="bi bi-collection-fill"></i></div>
+        <div class="stat-num"><%= stats.total_jobs || 0 %></div>
+        <div class="stat-lbl">Total Jobs</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="stat-card card text-center p-3">
+        <div class="stat-icon text-secondary"><i class="bi bi-file-text-fill"></i></div>
+        <div class="stat-num"><%= stats.total_applications || 0 %></div>
+        <div class="stat-lbl">Applications</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="stat-card card text-center p-3">
+        <div class="stat-icon text-success"><i class="bi bi-trophy-fill"></i></div>
+        <div class="stat-num"><%= stats.hired || 0 %></div>
+        <div class="stat-lbl">Hired</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Recent Users -->
+    <div class="col-lg-6">
+      <div class="card detail-card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center py-3 px-4">
+          <h5 class="mb-0 fw-bold"><i class="bi bi-people me-2"></i>Recent Users</h5>
+          <a href="/admin/users" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th class="px-4">Name</th>
+                <th>Role</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recentUsers.forEach(u => { %>
+              <tr>
+                <td class="px-4">
+                  <div class="fw-semibold"><%= u.name %></div>
+                  <div class="text-muted small"><%= u.email %></div>
+                </td>
+                <td>
+                  <span class="badge role-badge role-<%= u.role %>"><%= u.role %></span>
+                </td>
+                <td class="text-muted small"><%= new Date(u.created_at).toLocaleDateString() %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Jobs -->
+    <div class="col-lg-6">
+      <div class="card detail-card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center py-3 px-4">
+          <h5 class="mb-0 fw-bold"><i class="bi bi-briefcase me-2"></i>Recent Jobs</h5>
+          <a href="/admin/jobs" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th class="px-4">Job</th>
+                <th>Employer</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recentJobs.forEach(j => { %>
+              <tr>
+                <td class="px-4">
+                  <a href="/jobs/<%= j.id %>" class="fw-semibold text-white text-decoration-none"><%= j.title %></a>
+                  <div class="text-muted small"><%= j.company %></div>
+                </td>
+                <td class="text-muted small"><%= j.employer_name %></td>
+                <td>
+                  <span class="badge bg-<%= j.status === 'active' ? 'success' : j.status === 'draft' ? 'warning text-dark' : 'secondary' %>">
+                    <%= j.status %>
+                  </span>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

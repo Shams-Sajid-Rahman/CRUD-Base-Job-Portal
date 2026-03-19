@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employer Dashboard | JobPortal</title>
+  <link rel="icon" href="/img/job.png" type="image/png" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg sticky-top" id="main-navbar">
+    <div class="container-fluid px-3">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/index.html">
+        <img src="/img/job.png" alt="JobPortal" style="height:34px;width:34px;object-fit:contain;" />
+        Job<span class="brand-accent">Portal</span>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-2" id="navbarContent"></div>
+    </div>
+  </nav>
+  <div style="position:fixed;top:80px;left:50%;transform:translateX(-50%);width:420px;z-index:9999;" id="flash-container"></div>
+
+  <div class="dash-wrap">
+    <div class="dash-sidebar">
+      <div class="dash-sidebar-title text-gradient-green">Employer</div>
+      <div class="dash-sidebar-sub">Manage Platform</div>
+
+      <div class="sidebar-label">Overview</div>
+      <a href="/employer/dashboard.html" class="sidebar-item active si-green"><i class="bi bi-grid"></i> Dashboard</a>
+
+      <div class="sidebar-label">Jobs</div>
+      <a href="/employer/create-job.html" class="sidebar-item"><i class="bi bi-plus-circle"></i> Post Job</a>
+
+      <div class="sidebar-label">My Jobs</div>
+      <a href="/employer/dashboard.html?filter=total&label=Total+Jobs" class="sidebar-item" id="nav-total"><i class="bi bi-briefcase"></i> Total Jobs</a>
+      <a href="/employer/dashboard.html?filter=active&label=Active+Jobs" class="sidebar-item" id="nav-active"><i class="bi bi-check-circle"></i> Active</a>
+      <a href="/employer/dashboard.html?filter=closed&label=Closed+Jobs" class="sidebar-item" id="nav-closed"><i class="bi bi-x-circle"></i> Closed</a>
+      <a href="/employer/dashboard.html?filter=apps&label=Applications" class="sidebar-item" id="nav-apps"><i class="bi bi-people"></i> Applications</a>
+
+      <div class="sidebar-label">Account</div>
+      <a href="#" onclick="doLogout()" class="sidebar-item text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+
+    <div class="dash-main">
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h3 class="fw-bold mb-1 text-gradient-green" id="pageTitle">Employer Dashboard</h3>
+          <p class="text-muted small mb-0" id="pageSubtitle">Manage your job postings and applicants</p>
+        </div>
+        <a href="/employer/create-job.html" class="btn btn-success px-4" id="postJobBtn">
+          <i class="bi bi-plus-circle me-2"></i>Post a Job
+        </a>
+      </div>
+
+      <div class="row g-3 mb-5" id="statsRow">
+        <div class="col-12 text-center py-4"><div class="spinner-border"></div></div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Your Job Postings</h5>
+      </div>
+      <div class="card">
+        <div class="card-body p-0" id="jobsTable">
+          <div class="text-center py-5"><div class="spinner-border"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Edit Job</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="editModalBody">
+          <div class="text-center py-3"><div class="spinner-border spinner-border-sm"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/nav.js"></script>
+  <script>
+    const statDefs = [
+      { key:'total_jobs',        label:'Total Jobs',    accent:'sc-orange', icon:'bi-briefcase',    link:'/employer/dashboard.html?filter=total&label=Total+Jobs' },
+      { key:'active_jobs',       label:'Active',        accent:'sc-green',  icon:'bi-check-circle', link:'/employer/dashboard.html?filter=active&label=Active+Jobs' },
+      { key:'closed_jobs',       label:'Closed',        accent:'sc-purple', icon:'bi-x-circle',     link:'/employer/dashboard.html?filter=closed&label=Closed+Jobs' },
+      { key:'total_applications',label:'Applications',  accent:'sc-blue',   icon:'bi-people',       link:'/employer/dashboard.html?filter=apps&label=Applications' },
+    ];
+
+    let allJobs = [];
+    let activeFilter = '';
+
+    function renderJobsTable(filter) {
+      activeFilter = filter;
+      const filtered = filter && filter !== 'apps' ? allJobs.filter(j => j.status === filter) : allJobs;
+      const heading = filter === '' ? 'Your Job Postings' : filter === 'apps' ? 'Your Job Postings' : `${filter.charAt(0).toUpperCase()+filter.slice(1)} Jobs`;
+      document.querySelector('.dash-main h5.fw-bold').textContent = heading;
+      if (!filtered.length) {
+        document.getElementById('jobsTable').innerHTML = `<div class="text-center py-5 text-muted"><i class="bi bi-briefcase fs-1 d-block mb-3"></i><p>No ${filter || ''} jobs found.</p></div>`;
+        return;
+      }
+      document.getElementById('jobsTable').innerHTML = `
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Title</th><th>Type</th><th>Status</th><th>Applications</th><th>Posted</th><th>Actions</th></tr></thead>
+          <tbody>${filtered.map(j => `
+            <tr>
+              <td class="fw-medium">${j.title}<br><small class="text-muted">${j.company} &bull; ${j.location}</small></td>
+              <td><span class="type-badge type-${j.type.replace(' ','-')}">${j.type}</span></td>
+              <td><span class="badge rounded-pill status-${j.status}" style="font-size:.72rem;padding:4px 10px;">${j.status}</span></td>
+              <td><a href="/employer/applicants.html?id=${j.id}" style="color:var(--c1);font-weight:600;">${j.app_count} applicants</a></td>
+              <td class="text-muted small">${formatDate(j.created_at)}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-secondary me-1" onclick="openEdit(${j.id})"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteJob(${j.id}, this)"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    async function loadDashboard() {
+      const user = await getCurrentUser();
+      if (!user || user.role !== 'employer') { window.location.href = '/login.html'; return; }
+
+      const params = new URLSearchParams(window.location.search);
+      const urlFilter = params.get('filter');
+      const urlLabel  = params.get('label');
+
+      if (urlFilter !== null) {
+        // Filtered view mode — remove Dashboard highlight, add correct nav highlight
+        document.querySelector('.sidebar-item.active.si-green')?.classList.remove('active','si-green');
+        const navMap = { total:'nav-total', active:'nav-active', closed:'nav-closed', apps:'nav-apps' };
+        const navEl = document.getElementById(navMap[urlFilter] || 'nav-total');
+        if (navEl) navEl.classList.add('active','si-green');
+        document.getElementById('pageTitle').textContent = urlLabel || 'Jobs';
+        document.title = (urlLabel || 'Jobs') + ' | JobPortal';
+        document.getElementById('pageSubtitle').textContent = '';
+        document.getElementById('postJobBtn').style.display = 'none';
+      } else {
+        document.getElementById('pageTitle').textContent = `Good day, ${user.name} 👋`;
+      }
+
+      try {
+        const { jobs, stats } = await apiFetch('/api/employer/dashboard');
+        allJobs = jobs;
+
+        // Hide stats row in filtered view
+        if (urlFilter !== null) {
+          document.getElementById('statsRow').style.display = 'none';
+          const filterKey = urlFilter === 'apps' ? '' : urlFilter === 'total' ? '' : urlFilter;
+          renderJobsTable(urlFilter === 'total' ? '' : urlFilter);
+          return;
+        }
+
+        document.getElementById('statsRow').innerHTML = statDefs.map(s => `
+          <div class="col-6 col-md-3">
+            <a href="${s.link}" class="text-decoration-none">
+              <div class="card stat-card ${s.accent} p-3" style="cursor:pointer;transition:transform .18s,box-shadow .18s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.4)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                <i class="bi ${s.icon} stat-icon text-muted"></i>
+                <div class="stat-num">${stats[s.key] || 0}</div>
+                <div class="stat-lbl">${s.label}</div>
+              </div>
+            </a>
+          </div>`).join('');
+
+        if (!jobs.length) {
+          document.getElementById('jobsTable').innerHTML = `
+            <div class="text-center py-5 text-muted">
+              <i class="bi bi-briefcase fs-1 d-block mb-3"></i>
+              <p>No jobs posted yet.</p>
+              <a href="/employer/create-job.html" class="btn btn-success">Post Your First Job</a>
+            </div>`;
+          return;
+        }
+        renderJobsTable('');
+      } catch (err) {
+        showAlert(err.message);
+      }
+    }
+
+    async function openEdit(id) {
+      const modal = new bootstrap.Modal(document.getElementById('editModal'));
+      modal.show();
+      try {
+        const { job: j } = await apiFetch(`/api/employer/jobs/${id}`);
+        document.getElementById('editModalBody').innerHTML = `
+          <form id="editForm">
+            <div class="row g-3">
+              <div class="col-md-6"><label class="form-label">Title *</label><input class="form-control" name="title" value="${j.title}" required /></div>
+              <div class="col-md-6"><label class="form-label">Company *</label><input class="form-control" name="company" value="${j.company}" required /></div>
+              <div class="col-md-6"><label class="form-label">Location *</label><input class="form-control" name="location" value="${j.location}" required /></div>
+              <div class="col-md-6"><label class="form-label">Type *</label>
+                <select class="form-select" name="type">
+                  ${['full-time','part-time','contract','remote','internship'].map(t => `<option ${j.type===t?'selected':''}>${t}</option>`).join('')}
+                </select></div>
+              <div class="col-md-6"><label class="form-label">Min Salary</label><input class="form-control" name="salary_min" type="number" value="${j.salary_min || ''}" /></div>
+              <div class="col-md-6"><label class="form-label">Max Salary</label><input class="form-control" name="salary_max" type="number" value="${j.salary_max || ''}" /></div>
+              <div class="col-md-6"><label class="form-label">Experience</label>
+                <select class="form-select" name="experience_level">
+                  ${['entry','mid','senior','lead','any'].map(e => `<option ${j.experience_level===e?'selected':''}>${e}</option>`).join('')}
+                </select></div>
+              <div class="col-md-6"><label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                  ${['active','closed','draft'].map(s => `<option ${j.status===s?'selected':''}>${s}</option>`).join('')}
+                </select></div>
+              <div class="col-12"><label class="form-label">Description *</label><textarea class="form-control" name="description" rows="4" required>${j.description}</textarea></div>
+              <div class="col-12"><label class="form-label">Requirements</label><textarea class="form-control" name="requirements" rows="3">${j.requirements || ''}</textarea></div>
+              <div class="col-12"><label class="form-label">Benefits</label><textarea class="form-control" name="benefits" rows="3">${j.benefits || ''}</textarea></div>
+              <div class="col-12 d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="saveBtn">Save Changes</button>
+              </div>
+            </div>
+          </form>`;
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById('saveBtn');
+          btn.disabled = true;
+          const body = Object.fromEntries(new FormData(e.target).entries());
+          try {
+            await apiFetch(`/api/employer/jobs/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+            showAlert('Job updated successfully!', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+            loadDashboard();
+          } catch (err) { showAlert(err.message); btn.disabled = false; }
+        });
+      } catch (err) {
+        document.getElementById('editModalBody').innerHTML = `<p class="text-danger">${err.message}</p>`;
+      }
+    }
+
+    async function deleteJob(id, btn) {
+      if (!confirm('Delete this job? This cannot be undone.')) return;
+      btn.disabled = true;
+      try {
+        await apiFetch(`/api/employer/jobs/${id}`, { method: 'DELETE' });
+        showAlert('Job deleted.', 'success');
+        allJobs = allJobs.filter(j => j.id !== id);
+        renderJobsTable(activeFilter);
+      } catch (err) { showAlert(err.message); btn.disabled = false; }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+  </script>
+</body>
+</html>

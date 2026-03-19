@@ -1,0 +1,179 @@
+<%- include('../partials/header', { title: title }) %>
+
+<section class="auth-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="auth-card card">
+          <div class="card-body p-4 p-md-5">
+            <div class="text-center mb-4">
+              <div class="auth-logo mb-3"><i class="bi bi-briefcase-fill"></i></div>
+              <h2 class="fw-bold">Welcome Back</h2>
+              <p class="text-muted small">Sign in to your JobPortal account</p>
+            </div>
+
+            <!-- Role Tabs -->
+            <div class="role-tabs d-flex mb-4 gap-2">
+              <button type="button" class="role-tab-btn flex-fill active" data-role="seeker" onclick="switchRole('seeker', this)">
+                <i class="bi bi-person-fill me-1"></i>Job Seeker
+              </button>
+              <button type="button" class="role-tab-btn flex-fill" data-role="employer" onclick="switchRole('employer', this)">
+                <i class="bi bi-building me-1"></i>Employer
+              </button>
+              <button type="button" class="role-tab-btn flex-fill" data-role="admin" onclick="switchRole('admin', this)">
+                <i class="bi bi-shield-lock-fill me-1"></i>Admin
+              </button>
+            </div>
+
+            <form action="/auth/login" method="POST" novalidate>
+              <input type="hidden" name="role_hint" id="roleHint" value="seeker" />
+
+              <div class="mb-3">
+                <label class="form-label fw-medium">Email Address</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                  <input type="email" class="form-control" name="email" id="emailInput" placeholder="you@example.com" required autofocus />
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-medium">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                  <input type="password" class="form-control" name="password" id="passwordInput" placeholder="••••••••" required />
+                  <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('passwordInput', this)">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" id="signInBtn">
+                <i class="bi bi-person-fill me-2"></i>Sign In as Job Seeker
+              </button>
+            </form>
+
+            <hr class="my-4" />
+
+            <p class="text-center text-muted small mb-0">
+              Don't have an account?
+              <a href="/auth/register" class="text-primary fw-medium">Create one free</a>
+            </p>
+          </div>
+        </div>
+
+        <!-- Demo credentials -->
+        <div class="card mt-3 border-0 bg-transparent">
+          <div class="card-body px-0">
+            <p class="text-muted small text-center mb-2"><i class="bi bi-info-circle me-1"></i>Demo credentials (after running seed):</p>
+            <div class="d-flex flex-column gap-1">
+              <div class="demo-cred" id="demo-admin"><span class="badge bg-danger me-2">Admin</span>admin@jobportal.com / Admin@1234</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.role-tab-btn {
+  padding: 10px 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  background: transparent;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.role-tab-btn:hover {
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+.role-tab-btn.active[data-role="seeker"] {
+  background: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+}
+.role-tab-btn.active[data-role="employer"] {
+  background: #198754;
+  border-color: #198754;
+  color: #fff;
+}
+.role-tab-btn.active[data-role="admin"] {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
+}
+</style>
+
+<script>
+const roleConfig = {
+  seeker: {
+    label: 'Job Seeker',
+    icon: 'bi-person-fill',
+    btnClass: 'btn-primary',
+    demo: null
+  },
+  employer: {
+    label: 'Employer',
+    icon: 'bi-building',
+    btnClass: 'btn-success',
+    demo: null
+  },
+  admin: {
+    label: 'Admin',
+    icon: 'bi-shield-lock-fill',
+    btnClass: 'btn-danger',
+    demo: { email: 'admin@jobportal.com', password: 'Admin@1234' }
+  }
+};
+
+function switchRole(role, btn) {
+  // Update active tab
+  document.querySelectorAll('.role-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Update hidden input
+  document.getElementById('roleHint').value = role;
+
+  // Update sign-in button
+  const cfg = roleConfig[role];
+  const signInBtn = document.getElementById('signInBtn');
+  signInBtn.className = `btn ${cfg.btnClass} w-100 py-2 fw-semibold`;
+  signInBtn.innerHTML = `<i class="bi ${cfg.icon} me-2"></i>Sign In as ${cfg.label}`;
+
+  // Auto-fill admin demo credentials
+  if (cfg.demo) {
+    document.getElementById('emailInput').value = cfg.demo.email;
+    document.getElementById('passwordInput').value = cfg.demo.password;
+  } else {
+    document.getElementById('emailInput').value = '';
+    document.getElementById('passwordInput').value = '';
+  }
+
+  // Show/hide demo creds
+  document.getElementById('demo-admin').style.display = role === 'admin' ? '' : 'none';
+}
+
+// Initialize — hide admin demo cred on load since default tab is seeker
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('demo-admin').style.display = 'none';
+});
+
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'bi bi-eye-slash';
+  } else {
+    input.type = 'password';
+    icon.className = 'bi bi-eye';
+  }
+}
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,108 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="mb-4">
+        <a href="/employer/dashboard" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+        </a>
+      </div>
+
+      <div class="card detail-card">
+        <div class="card-header py-3 px-4">
+          <h4 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2 text-primary"></i>Post a New Job</h4>
+        </div>
+        <div class="card-body p-4 p-lg-5">
+          <form action="/employer/jobs" method="POST" novalidate>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-8">
+                <label class="form-label fw-medium">Job Title <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="title" placeholder="e.g. Senior Software Engineer" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-medium">Job Type <span class="text-danger">*</span></label>
+                <select class="form-select" name="type" required>
+                  <option value="full-time">Full-time</option>
+                  <option value="part-time">Part-time</option>
+                  <option value="contract">Contract</option>
+                  <option value="remote">Remote</option>
+                  <option value="internship">Internship</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Company Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="company" placeholder="e.g. Acme Corporation" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Location <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="location" placeholder="e.g. New York, NY or Remote" required />
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <label class="form-label fw-medium">Salary Min ($/yr)</label>
+                <input type="number" class="form-control" name="salary_min" placeholder="e.g. 60000" min="0" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-medium">Salary Max ($/yr)</label>
+                <input type="number" class="form-control" name="salary_max" placeholder="e.g. 90000" min="0" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-medium">Experience Level</label>
+                <select class="form-select" name="experience_level">
+                  <option value="any">Any Level</option>
+                  <option value="entry">Entry Level</option>
+                  <option value="mid">Mid Level</option>
+                  <option value="senior">Senior Level</option>
+                  <option value="lead">Lead / Manager</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-medium">Job Description <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="description" rows="8"
+                placeholder="Describe the role, responsibilities, and what the job involves..." required></textarea>
+              <div class="form-text">Be specific about day-to-day responsibilities and team structure.</div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-medium">Requirements</label>
+              <textarea class="form-control" name="requirements" rows="5"
+                placeholder="List required skills, qualifications, and experience..."></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-medium">Benefits &amp; Perks</label>
+              <textarea class="form-control" name="benefits" rows="4"
+                placeholder="Health insurance, 401k, flexible hours, remote work..."></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-medium">Posting Status</label>
+              <select class="form-select" name="status">
+                <option value="active">Active — Visible to job seekers</option>
+                <option value="draft">Draft — Save for later</option>
+              </select>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+              <a href="/employer/dashboard" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                <i class="bi bi-send me-2"></i>Post Job
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

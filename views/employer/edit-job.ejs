@@ -1,0 +1,103 @@
+<%- include('../partials/header', { title: title }) %>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="mb-4">
+        <a href="/employer/dashboard" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+        </a>
+      </div>
+
+      <div class="card detail-card">
+        <div class="card-header py-3 px-4">
+          <h4 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2 text-warning"></i>Edit Job Posting</h4>
+        </div>
+        <div class="card-body p-4 p-lg-5">
+          <form action="/employer/jobs/<%= job.id %>?_method=PUT" method="POST" novalidate>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-8">
+                <label class="form-label fw-medium">Job Title <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="title" value="<%= job.title %>" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-medium">Job Type <span class="text-danger">*</span></label>
+                <select class="form-select" name="type" required>
+                  <% ['full-time','part-time','contract','remote','internship'].forEach(t => { %>
+                    <option value="<%= t %>" <%= job.type === t ? 'selected' : '' %>><%= t.charAt(0).toUpperCase() + t.slice(1) %></option>
+                  <% }) %>
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Company Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="company" value="<%= job.company %>" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Location <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="location" value="<%= job.location %>" required />
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <label class="form-label fw-medium">Salary Min ($/yr)</label>
+                <input type="number" class="form-control" name="salary_min" value="<%= job.salary_min || '' %>" min="0" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-medium">Salary Max ($/yr)</label>
+                <input type="number" class="form-control" name="salary_max" value="<%= job.salary_max || '' %>" min="0" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-medium">Experience Level</label>
+                <select class="form-select" name="experience_level">
+                  <% ['any','entry','mid','senior','lead'].forEach(lvl => { %>
+                    <option value="<%= lvl %>" <%= job.experience_level === lvl ? 'selected' : '' %>>
+                      <%= lvl === 'any' ? 'Any Level' : lvl.charAt(0).toUpperCase() + lvl.slice(1) + ' Level' %>
+                    </option>
+                  <% }) %>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-medium">Job Description <span class="text-danger">*</span></label>
+              <textarea class="form-control" name="description" rows="8" required><%= job.description %></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-medium">Requirements</label>
+              <textarea class="form-control" name="requirements" rows="5"><%= job.requirements || '' %></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-medium">Benefits &amp; Perks</label>
+              <textarea class="form-control" name="benefits" rows="4"><%= job.benefits || '' %></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-medium">Status</label>
+              <select class="form-select" name="status">
+                <option value="active" <%= job.status === 'active' ? 'selected' : '' %>>Active — Visible to job seekers</option>
+                <option value="draft" <%= job.status === 'draft' ? 'selected' : '' %>>Draft — Hidden</option>
+                <option value="closed" <%= job.status === 'closed' ? 'selected' : '' %>>Closed — No more applications</option>
+              </select>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+              <a href="/employer/dashboard" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-warning px-4 fw-semibold">
+                <i class="bi bi-save me-2"></i>Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
