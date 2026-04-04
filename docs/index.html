@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Portal - CRUD Application</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">💼 Job Portal</div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#tech">Technologies</a></li>
+                <li><a href="#roles">User Roles</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Job Portal</h1>
+                <p>A Full-Stack CRUD Application with Role-Based Access Control</p>
+                <div class="hero-buttons">
+                    <a href="https://github.com/Shams-Sajid-Rahman/CRUD-Base-Job-Portal" class="btn btn-primary">View on GitHub</a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Role-Based Access</h3>
+                    <p>Three distinct user roles: Job Seeker, Employer, and Administrator with custom permissions</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3>Complete CRUD Operations</h3>
+                    <p>Create, Read, Update, and Delete functionality for jobs, users, and applications</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💼</div>
+                    <h3>Job Management</h3>
+                    <p>Employers can post jobs, manage applicants, and track applications in real-time</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>User Dashboard</h3>
+                    <p>Personalized dashboards for job seekers, employers, and administrators</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📤</div>
+                    <h3>File Upload System</h3>
+                    <p>Secure CV and NID document upload with validation and storage</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure Authentication</h3>
+                    <p>Password hashing with bcryptjs and session management</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- User Roles Section -->
+    <section id="roles" class="roles">
+        <div class="container">
+            <h2>User Roles & Permissions</h2>
+            <div class="roles-grid">
+                <div class="role-card">
+                    <h3>👨‍💼 Job Seeker</h3>
+                    <ul>
+                        <li>Browse available jobs</li>
+                        <li>Apply to job postings</li>
+                        <li>Upload CV and NID</li>
+                        <li>Track application status</li>
+                        <li>View profile and applications</li>
+                    </ul>
+                </div>
+                <div class="role-card">
+                    <h3>🏢 Employer</h3>
+                    <ul>
+                        <li>Post new job listings</li>
+                        <li>Edit and delete jobs</li>
+                        <li>View applications received</li>
+                        <li>Manage applicants</li>
+                        <li>Track hiring progress</li>
+                    </ul>
+                </div>
+                <div class="role-card">
+                    <h3>⚙️ Administrator</h3>
+                    <ul>
+                        <li>Manage all users</li>
+                        <li>Oversee job postings</li>
+                        <li>View all applications</li>
+                        <li>System statistics</li>
+                        <li>User account management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technologies Section -->
+    <section id="tech" class="technologies">
+        <div class="container">
+            <h2>Technology Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <h4>Backend</h4>
+                    <ul>
+                        <li>Node.js & Express.js</li>
+                        <li>MySQL Database</li>
+                        <li>Session Management</li>
+                    </ul>
+                </div>
+                <div class="tech-item">
+                    <h4>Frontend</h4>
+                    <ul>
+                        <li>HTML5 & CSS3</li>
+                        <li>EJS Template Engine</li>
+                        <li>Vanilla JavaScript</li>
+                    </ul>
+                </div>
+                <div class="tech-item">
+                    <h4>Security</h4>
+                    <ul>
+                        <li>bcryptjs Password Hashing</li>
+                        <li>Session Authentication</li>
+                        <li>File Upload Validation</li>
+                    </ul>
+                </div>
+                <div class="tech-item">
+                    <h4>Dependencies</h4>
+                    <ul>
+                        <li>Multer (File Upload)</li>
+                        <li>Dotenv (Env Variables)</li>
+                        <li>Method Override</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Structure -->
+    <section class="structure">
+        <div class="container">
+            <h2>Project Structure</h2>
+            <pre><code>job-portal/
+├── routes/              # Express route handlers
+│   ├── auth.js         # Authentication routes
+│   ├── jobs.js         # Job management routes
+│   ├── employer.js     # Employer-specific routes
+│   ├── seeker.js       # Job seeker routes
+│   ├── admin.js        # Admin routes
+│   └── api/            # REST API endpoints
+├── views/              # EJS templates
+│   ├── admin/          # Admin pages
+│   ├── employer/       # Employer pages
+│   ├── seeker/         # Seeker pages
+│   ├── auth/           # Login/Register
+│   └── partials/       # Reusable components
+├── public/             # Static files
+│   ├── css/           # Stylesheets
+│   ├── js/            # Client-side JavaScript
+│   └── uploads/       # User uploads (CV, NID)
+├── config/            # Configuration files
+│   ├── db.js          # Database config
+│   └── upload.js      # File upload config
+├── middleware/        # Custom middleware
+│   └── auth.js        # Authentication middleware
+├── schema.sql         # Database schema
+└── app.js             # Express app entry point</code></pre>
+        </div>
+    </section>
+
+    <!-- Database Schema Section -->
+    <section class="database">
+        <div class="container">
+            <h2>Database Schema</h2>
+            <p>The application uses a relational MySQL database with the following main tables:</p>
+            <div class="db-tables">
+                <div class="table-item">
+                    <h4>Users Table</h4>
+                    <p>Stores user information with role-based identification</p>
+                </div>
+                <div class="table-item">
+                    <h4>Jobs Table</h4>
+                    <p>Job listings created by employers with descriptions and requirements</p>
+                </div>
+                <div class="table-item">
+                    <h4>Applications Table</h4>
+                    <p>Tracks job applications with status and timestamps</p>
+                </div>
+                <div class="table-item">
+                    <h4>Additional Tables</h4>
+                    <p>Supporting tables for file uploads, admin logs, and more</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section class="installation">
+        <div class="container">
+            <h2>Installation & Setup</h2>
+            <div class="installation-steps">
+                <div class="step">
+                    <h4>1. Clone Repository</h4>
+                    <code>git clone https://github.com/Shams-Sajid-Rahman/CRUD-Base-Job-Portal.git</code>
+                </div>
+                <div class="step">
+                    <h4>2. Install Dependencies</h4>
+                    <code>npm install</code>
+                </div>
+                <div class="step">
+                    <h4>3. Configure Database</h4>
+                    <code>mysql -u root -p < schema.sql</code>
+                </div>
+                <div class="step">
+                    <h4>4. Set Environment Variables</h4>
+                    <p>Create .env file with your database credentials</p>
+                </div>
+                <div class="step">
+                    <h4>5. Seed Database (Optional)</h4>
+                    <code>npm run seed</code>
+                </div>
+                <div class="step">
+                    <h4>6. Start Application</h4>
+                    <code>npm start</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Use?</h2>
+            <p>This is a demonstration page. To use the full Job Portal application, you need to run it locally or deploy it to a server.</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/Shams-Sajid-Rahman/CRUD-Base-Job-Portal" class="btn btn-primary">View Full Repository</a>
+                <a href="https://github.com/Shams-Sajid-Rahman" class="btn btn-secondary">View Developer Profile</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Job Portal - CSE311L Database Systems Lab</p>
+            <p>Created by: Shams Sajid Rahman</p>
+            <div class="footer-links">
+                <a href="https://github.com/Shams-Sajid-Rahman/CRUD-Base-Job-Portal">GitHub Repository</a>
+                <a href="#features">Features</a>
+                <a href="#tech">Technology</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
