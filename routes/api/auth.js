@@ -40,7 +40,7 @@ router.post('/register', (req, res, next) => {
     next();
   });
 }, async (req, res) => {
-  const { name, email, password, confirm_password, role, company_name, nid_number } = req.body;
+  const { name, email, password, confirm_password, role, phone_number, bio, company_name, company_website, nid_number } = req.body;
   if (!name || !email || !password || !role) return res.status(400).json({ error: 'All fields are required.' });
   if (!nid_number || !/^\d{10}(\d{7})?$/.test(nid_number.trim())) return res.status(400).json({ error: 'A valid 10 or 17-digit NID number is required.' });
   if (!req.file) return res.status(400).json({ error: 'NID photo or scan is required.' });
@@ -55,8 +55,8 @@ router.post('/register', (req, res, next) => {
     const nidImagePath = '/uploads/nid/' + req.file.filename;
     const hash = await bcrypt.hash(password, 12);
     const [result] = await db.query(
-      'INSERT INTO users (name, email, password, role, nid_number, nid_image, company_name) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [name.trim(), email.trim().toLowerCase(), hash, role, nid_number.trim(), nidImagePath, company_name || null]
+      'INSERT INTO users (name, email, password, role, phone, bio, nid_number, nid_image, company_name, company_website) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [name.trim(), email.trim().toLowerCase(), hash, role, phone_number || null, bio || null, nid_number.trim(), nidImagePath, company_name || null, company_website || null]
     );
     req.session.user = { id: result.insertId, name: name.trim(), email, role };
     res.json({ success: true, user: req.session.user });

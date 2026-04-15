@@ -66,6 +66,19 @@
                   </div>
 
                   <div class="col-12">
+                    <label class="form-label">Phone Number</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                      <input type="tel" class="form-control" id="phone_number" placeholder="+880 1234-567890" required />
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <label class="form-label">Bio</label>
+                    <textarea class="form-control" id="bio" placeholder="Tell us about yourself..." rows="3"></textarea>
+                  </div>
+
+                  <div class="col-12">
                     <label class="form-label">National ID (NID) Number <span style="color:var(--c6);">*</span></label>
                     <div class="input-group">
                       <span class="input-group-text"><i class="bi bi-credit-card-2-front"></i></span>
@@ -95,6 +108,14 @@
                     <div class="input-group">
                       <span class="input-group-text"><i class="bi bi-building"></i></span>
                       <input type="text" class="form-control" id="company_name" placeholder="Your company name" />
+                    </div>
+                  </div>
+
+                  <div class="col-12" id="companyWebsiteField" style="display:none;">
+                    <label class="form-label">Company Website</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                      <input type="url" class="form-control" id="company_website" placeholder="https://example.com" />
                     </div>
                   </div>
 
@@ -142,6 +163,7 @@
       btn.classList.add('active');
       document.getElementById('roleInput').value = role;
       document.getElementById('companyField').style.display = role === 'employer' ? 'block' : 'none';
+      document.getElementById('companyWebsiteField').style.display = role === 'employer' ? 'block' : 'none';
     }
 
     function togglePwd(id, btn) {
@@ -178,11 +200,14 @@
       const formData = new FormData();
       formData.append('name', document.getElementById('name').value);
       formData.append('email', document.getElementById('email').value);
+      formData.append('phone_number', document.getElementById('phone_number').value);
+      formData.append('bio', document.getElementById('bio').value);
       formData.append('password', document.getElementById('password').value);
       formData.append('confirm_password', document.getElementById('confirm_password').value);
       formData.append('role', document.getElementById('roleInput').value);
       formData.append('nid_number', document.getElementById('nid_number').value);
       formData.append('company_name', document.getElementById('company_name').value);
+      formData.append('company_website', document.getElementById('company_website').value);
       const nidFile = document.getElementById('nid_image').files[0];
       if (nidFile) formData.append('nid_image', nidFile);
 
